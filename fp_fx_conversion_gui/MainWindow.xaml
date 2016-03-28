@@ -47,6 +47,10 @@
         <TextBox Text="{Binding IcarusDir, NotifyOnSourceUpdated=True,  UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource txtBoxStyle}"/>
 
         <Separator Margin="0,5,0,5"/>
+        <UniformGrid Columns="2" Height="25">
+            <RadioButton Content="Save Output as CSV" IsChecked="{Binding SaveAsCSV}" Grid.Column="0" VerticalAlignment="Center"/>
+            <RadioButton Grid.Column="1" Content="Save Output as Txt" VerticalAlignment="Center"/>
+        </UniformGrid>
         <Button Content="Compile and Verify with iVerilog" Command="{Binding ExecuteIcarus}"/>
         <Separator Margin="0,5,0,5"/>
         <Label Content="{Binding StatusString, TargetNullValue={x:Static resx:Res.Status_Default}, FallbackValue={x:Static resx:Res.Status_Default}}" Height="30" FontFamily="Consolas" FontSize="15" FontWeight="DemiBold" Foreground="DarkMagenta"></Label>

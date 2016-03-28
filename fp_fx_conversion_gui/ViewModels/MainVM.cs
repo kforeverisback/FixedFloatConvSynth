@@ -296,13 +296,26 @@ namespace fp_fx_conversion_gui.ViewModels
 			return (float)fxVal / (float)Math.Pow(2, bits - 1);
 		}
 
+		float PercentCalc(double input, double output)
+		{
+			return (float)(100 * Math.Abs((input - output)/ input));
+		}
+
+		string numeric_format = "{0:N15}           {1:N15}           {2:N10}%    ";
+		string numeric_format_csv = "{0:N15},{1:N15},{2:N5}%";
 		public void VerifyFixedToFloatValues(string filePath, int bits)
 		{
 			if(File.Exists(filePath))
 			{
+				string header_format_csv = "Input_Fixed,Output_Float,Error";
+				string header_format = "Input(Fixed)             Output(Float)            % Error   ";
 				StringBuilder sb = new StringBuilder();
-				sb.AppendLine("Input File: " + filePath);
-				sb.AppendLine("Input(Fixed)             Output(Float)            % Error   ");
+
+				if(!SaveAsCSV)	sb.AppendLine("Input File: " + filePath);
+				string format = SaveAsCSV ? numeric_format_csv : numeric_format;
+				string hformat = SaveAsCSV ? header_format_csv : header_format;
+				sb.AppendLine(hformat);
+
 				string[] lines = File.ReadAllLines(filePath);
 				List<float> fixedIn = new List<float>();
 				foreach (var l in lines)
@@ -312,18 +325,19 @@ namespace fp_fx_conversion_gui.ViewModels
 					fixedIn.Add(fxValFp);
 					float fpVal = GetFloatingPointFromBinary(vals[1]);
 
-					float percent = (float)(100 * Math.Abs(fxValFp * 1000000 - fpVal * 1000000) / (fxValFp * 1000000));
-					string added = string.Format("{0:N10}               {1:N10}               {2:N2}%    ", fxValFp, fpVal, percent);
+					float percent = PercentCalc(fxValFp, fpVal);
+					string added = string.Format(format, fxValFp, fpVal, percent);
 					sb.AppendLine(added);
 				}
 
-				File.Delete("output\\Result_Fixed_to_Float.txt");
-				using (StreamWriter sw = File.CreateText("output\\Result_Fixed_to_Float.txt"))
+				string outPath = "output\\Result_Fixed_to_Float" + (SaveAsCSV ? ".csv" : ".txt");
+				File.Delete(outPath);
+				using (StreamWriter sw = File.CreateText(outPath))
 				{
 					sw.Write(sb.ToString());
 				}
 
-				Process.Start("output\\Result_Fixed_to_Float.txt");
+				Process.Start(outPath);
 			}
 		}
 
@@ -331,9 +345,15 @@ namespace fp_fx_conversion_gui.ViewModels
 		{
 			if (File.Exists(filePath))
 			{
+				string header_format_csv = "Input_Float,Output_Fixed,Error";
+				string header_format = "Input(Float)             Output(Fixed)            % Error   ";
 				StringBuilder sb = new StringBuilder();
-				sb.AppendLine("Input File: " + filePath);
-				sb.AppendLine("Input(Float)             Output(fixed)            % Error   ");
+				if (!SaveAsCSV) sb.AppendLine("Input File: " + filePath);
+
+				string format = SaveAsCSV ? numeric_format_csv : numeric_format;
+				string hformat = SaveAsCSV ? header_format_csv : header_format;
+				sb.AppendLine(hformat);
+
 				string[] lines = File.ReadAllLines(filePath);
 				List<float> fixedIn = new List<float>();
 				foreach (var l in lines)
@@ -343,18 +363,19 @@ namespace fp_fx_conversion_gui.ViewModels
 					fixedIn.Add(fxValFp);
 					float fpVal = GetFloatingPointFromBinary(vals[0]);
 
-					float percent = (float)(100 * Math.Abs(fxValFp * 1000000 - fpVal * 1000000) / (fpVal * 1000000));
-					string added = string.Format("{0:N10}               {1:N10}               {2:N2}%    ", fpVal, fxValFp, percent);
+					float percent = PercentCalc(fxValFp, fpVal);
+
+					string added = string.Format(format, fpVal, fxValFp, percent);
 					sb.AppendLine(added);
 				}
 
-				File.Delete("output\\Result_Float_to_Fixed.txt");
-				using (StreamWriter sw = File.CreateText("output\\Result_Float_to_Fixed.txt"))
+				string outPath = "output\\Result_Float_to_Fixed" + (SaveAsCSV ? ".csv" : ".txt");
+				using (StreamWriter sw = File.CreateText(outPath))
 				{
 					sw.Write(sb.ToString());
 				}
 
-				Process.Start("output\\Result_Float_to_Fixed.txt");
+				Process.Start(outPath);
 			}
 		}
 
@@ -419,8 +440,9 @@ namespace fp_fx_conversion_gui.ViewModels
 			Select_Fixed2FP = true;
 			Select_FP2Fixed = true;
 			Executing = false;
-			Fp2Fx_TotalBits = Fx2Fp_TotalBits = 16;
-			Fp2Fx_TotalTestVectors = Fx2Fp_TotalTestVectors = 50;
+			Fp2Fx_TotalBits = Fx2Fp_TotalBits = 32;
+			Fp2Fx_TotalTestVectors = Fx2Fp_TotalTestVectors = 100;
+			SaveAsCSV = false;
 
 			IcarusDir = Helpers.Utility.GetFullSystemPath("iverilog.exe");
 			if (IcarusDir == null)
@@ -472,6 +494,9 @@ namespace fp_fx_conversion_gui.ViewModels
 			get { return _ShowStatus; }
 			set { _ShowStatus = value; RaisePropertyChanged("ShowStatus"); }
 		}
+
+
+		public bool SaveAsCSV { get; set; }
 
 
 	}
