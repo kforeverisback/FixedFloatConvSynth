@@ -1,0 +1,44 @@
+// shift "in" left until the most significant bit is a "1"
+// pass the shifted value, and number of shifts required
+// to the output.
+
+module scale_up (in,out,distance);
+
+parameter WIDTH = 16;
+parameter WIDTH_DIST = 4;
+
+input [WIDTH-1:0] in;
+output [WIDTH-1:0] out;
+output [WIDTH_DIST-1:0] distance;
+wire [WIDTH_DIST-1:0] distance_w;
+
+wire [(WIDTH_DIST+1) * WIDTH-1:0] shift_layers;
+assign shift_layers [WIDTH-1:0] = in;
+
+genvar i;
+generate
+	for (i=0;i<WIDTH_DIST;i=i+1)
+	begin : shft
+		wire [WIDTH-1:0] layer_in;
+		wire [WIDTH-1:0] shifted_out;
+		wire [WIDTH-1:0] layer_out;
+		
+		assign layer_in = shift_layers[(i+1)*WIDTH-1:i*WIDTH];
+
+		// are there ones in the upper part?
+		wire shift_desired = ~|(layer_in[WIDTH-1:WIDTH-(1 << (WIDTH_DIST-1-i))]);
+		assign distance_w[(WIDTH_DIST-1-i)] = shift_desired;
+
+		// barrel shifter
+		assign shifted_out = layer_in << (1 << (WIDTH_DIST-1-i));
+		assign layer_out = shift_desired ? shifted_out : layer_in;
+		
+		assign shift_layers[(i+2)*WIDTH-1:(i+1)*WIDTH] = layer_out;
+								
+	end
+endgenerate
+
+assign distance = |in?distance_w:0;
+assign out = shift_layers[(WIDTH_DIST+1)*WIDTH-1 : WIDTH_DIST*WIDTH];
+
+endmodule

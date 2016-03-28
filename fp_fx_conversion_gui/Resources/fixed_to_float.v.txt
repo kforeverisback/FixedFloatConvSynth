@@ -1,0 +1,35 @@
+module fixed_to_ieeefp(fp_output, fx_input);
+
+	parameter FIXED_TOTAL_BIT = 8;
+	
+	input [FIXED_TOTAL_BIT-1:0] fx_input;
+	output [31:0] fp_output;
+	//Total input bit width = 32
+	wire fx_sign = fx_input[FIXED_TOTAL_BIT-1]; 
+	
+	//assign {fx_sign, fx_number[31:32-FIXED_TOTAL_BIT]} = fx_input;
+	
+	wire [31:0] fx_number;
+	
+	wire [22:0] fp_mantissa;
+	wire [7:0] fp_exp;
+	
+	wire [31:0] scaled_out;
+	wire [7:0] shift_amnt;
+	
+	wire [FIXED_TOTAL_BIT-2:0] fx_number_without_sign;
+	twos_complement tc(fx_number_without_sign, fx_input[FIXED_TOTAL_BIT-2:0]);
+	defparam tc .BITS = FIXED_TOTAL_BIT-1;
+	
+	assign fx_number[31:32-FIXED_TOTAL_BIT+1] = fx_sign?fx_number_without_sign:fx_input[FIXED_TOTAL_BIT-2:0];
+	assign fx_number[32-FIXED_TOTAL_BIT:0] = 0;
+	scale_up sc (.in(fx_number),
+				.out(scaled_out),
+				.distance(shift_amnt));
+		defparam sc .WIDTH = 32;
+		defparam sc .WIDTH_DIST = 8;
+	
+	assign fp_exp = 8'd127-shift_amnt-1;
+	assign fp_mantissa = scaled_out[31-1:32-23-1];
+	assign fp_output = {fx_sign, fp_exp, fp_mantissa};	
+endmodule

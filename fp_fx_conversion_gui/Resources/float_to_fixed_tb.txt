@@ -1,0 +1,36 @@
+module float_to_fixed_tb;
+
+	parameter FIXED_TOTAL_BIT = __TOTAL_BITS__;
+	reg [31:0] float_in;
+	
+	wire [FIXED_TOTAL_BIT-1:0] fixed_out;
+	
+	initial begin
+		$dumpfile("float_to_fixed.vcd");
+		$dumpvars(0, v);
+	end
+	integer fileHandle, dummyHandle;
+	integer fWriteHandle;
+	always @(fixed_out) begin
+	   #5 $fwrite(fWriteHandle,"%b%b%b:%b\n", float_in[31], float_in[30:23],float_in[22:0], fixed_out);   
+	   //#5 $display("%b %b %b<>%b\n", float_in[31], float_in[30:23],float_in[22:0], fixed_out);   
+	end
+
+	initial begin: apply_stimulus
+
+		fWriteHandle = $fopen("fp2fx_out.txt");
+		fileHandle = $fopen("fp2fx_data.txt", "rb"); //assume
+		while(!$feof(fileHandle))
+		begin
+			dummyHandle = $fscanf(fileHandle, "%b\n", float_in);
+			#10;
+		end
+		#10
+
+	$finish;
+	end 
+	
+	ieeefp_to_fixed v(fixed_out, float_in);
+	//ieeefp_to_fixed v(sign, fixed_out, float_in);
+	defparam v .FIXED_TOTAL_BIT = FIXED_TOTAL_BIT;
+endmodule 

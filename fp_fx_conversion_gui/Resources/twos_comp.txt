@@ -1,0 +1,20 @@
+//Used two's complement from this WEB:"http://www.ece.lsu.edu/ee3755/2012f/l05.v.html".
+//Visit that for various efficient modules
+module twos_complement(minus_i,i);
+	parameter BITS = 32;
+	input [BITS-1:0] i;
+	output [BITS-1:0] minus_i;
+	
+	assign minus_i = -i;
+
+`ifdef NOT_THE_WAY_TO_DO_IT
+	// The methods below work but they are slightly less clear to a
+	// human reader and waste hardware and time unless the synthesis
+	// program realizes it's just negation.
+
+	assign        minus_i = 0 - i;  // No advantage over unary -.
+	assign        minus_i = ~i + 1; // No advantage over -.
+	assign        minus_i = i * -1; // Wastes hardware and time.
+	assign        minus_i = i / -1; // Wastes hardware and lots of time.
+`endif
+endmodule
