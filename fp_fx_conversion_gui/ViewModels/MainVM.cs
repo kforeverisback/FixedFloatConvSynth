@@ -20,6 +20,7 @@ namespace fp_fx_conversion_gui.ViewModels
 
 		public void GenerateModule()
 		{
+			Directory.CreateDirectory(OutputDir);
 			Dictionary<string, string> files = new Dictionary<string, string>();
 			if(Select_FP2Fixed)
 			{
@@ -46,7 +47,6 @@ namespace fp_fx_conversion_gui.ViewModels
 
 			files.Add("twos_comp.v", Resources.Res.twos_comp);
 
-			Directory.CreateDirectory(OutputDir);
 			foreach (var fd in files)
 			{
 				string fn = Path.Combine(OutputDir, fd.Key);
@@ -95,72 +95,8 @@ namespace fp_fx_conversion_gui.ViewModels
 				{
 					byte[] fbytes = BitConverter.GetBytes(val);
 					BitArray ba = new BitArray(fbytes);
-#if DEBUG
 					sw.WriteLine(ba.ToBitString());
 
-					//sw.Write(ba.ToBitString());
-					//sw.WriteLine(":" + val.ToString());
-#else
-					sw.WriteLine(ba.ToBitString());
-#endif
-				}
-			}
-		}
-
-		public void GenerateFixedPointData2(int count, int bits, string filePath)
-		{
-			byte[] fbb = BitConverter.GetBytes(18895);
-			BitArray baa = new BitArray(fbb);
-			string ssss = baa.ToBitString(bits);
-
-			File.Delete(filePath);
-			using (StreamWriter sw = File.CreateText(filePath))
-			{
-				Random r = new Random(_seed.Next());
-				int lim = count / 4;
-				List<int> values = new List<int>(count);
-				int lowLim = (int)(-Math.Pow(2, bits - 1)),
-					highLim = -lowLim;
-				for (int i = 0; i < lim; i++)
-				{
-					int val = r.Next(lowLim / bits, highLim / bits);
-					values.Add(val);
-				}
-
-				lowLim *= 2; highLim *= 2;
-				for (int i = 0; i < lim; i++)
-				{
-					int val = r.Next(lowLim / bits, highLim / bits);
-					values.Add(val);
-
-				}
-				lowLim *= 2; highLim *= 2;
-
-				for (int i = 0; i < lim; i++)
-				{
-					int val = r.Next(lowLim / bits, highLim / bits);
-					values.Add(val);
-				}
-
-				lim = count - lim * 3;
-				lowLim *= 2; highLim *= 2;
-				for (int i = 0; i < lim; i++)
-				{
-					int val = r.Next(lowLim / bits, highLim / bits);
-					values.Add(val);
-				}
-
-				foreach (var val in values)
-				{
-					byte[] fbytes = BitConverter.GetBytes(val);
-					BitArray ba = new BitArray(fbytes);
-#if DEBUG
-					sw.Write(ba.ToBitString(bits));
-					float valf = (float)((float)val / Math.Pow(2, bits - 1));
-					sw.WriteLine(":" + valf.ToString());
-#else
-					sw.WriteLine(ba.ToBitString());
-#endif
 				}
 			}
 		}
@@ -243,7 +179,7 @@ namespace fp_fx_conversion_gui.ViewModels
 			ProcessStartInfo startInfo = new ProcessStartInfo();
 			//startInfo.WorkingDirectory = Path.GetDirectoryName(filefullPath);
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			startInfo.FileName = Utility.GetFullSystemPath("vvp.exe");
+			startInfo.FileName = Path.Combine(Path.GetDirectoryName(IcarusDir),"vvp.exe");
 			startInfo.WorkingDirectory = Path.Combine(Environment.CurrentDirectory, "output");
 			startInfo.Arguments = args;
 			startInfo.CreateNoWindow = true;
@@ -311,9 +247,9 @@ namespace fp_fx_conversion_gui.ViewModels
 				string header_format = "Input(Fixed)             Output(Float)            % Error   ";
 				StringBuilder sb = new StringBuilder();
 
-				if(!SaveAsCSV)	sb.AppendLine("Input File: " + filePath);
-				string format = SaveAsCSV ? numeric_format_csv : numeric_format;
-				string hformat = SaveAsCSV ? header_format_csv : header_format;
+				if(!GenerateMatlabAndCSV)	sb.AppendLine("Input File: " + filePath);
+				string format = GenerateMatlabAndCSV ? numeric_format_csv : numeric_format;
+				string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
 				sb.AppendLine(hformat);
 
 				string[] lines = File.ReadAllLines(filePath);
@@ -330,7 +266,7 @@ namespace fp_fx_conversion_gui.ViewModels
 					sb.AppendLine(added);
 				}
 
-				string outPath = "output\\Result_Fixed_to_Float" + (SaveAsCSV ? ".csv" : ".txt");
+				string outPath = "output\\Result_Fixed_to_Float" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
 				File.Delete(outPath);
 				using (StreamWriter sw = File.CreateText(outPath))
 				{
@@ -348,10 +284,10 @@ namespace fp_fx_conversion_gui.ViewModels
 				string header_format_csv = "Input_Float,Output_Fixed,Error";
 				string header_format = "Input(Float)             Output(Fixed)            % Error   ";
 				StringBuilder sb = new StringBuilder();
-				if (!SaveAsCSV) sb.AppendLine("Input File: " + filePath);
+				if (!GenerateMatlabAndCSV) sb.AppendLine("Input File: " + filePath);
 
-				string format = SaveAsCSV ? numeric_format_csv : numeric_format;
-				string hformat = SaveAsCSV ? header_format_csv : header_format;
+				string format = GenerateMatlabAndCSV ? numeric_format_csv : numeric_format;
+				string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
 				sb.AppendLine(hformat);
 
 				string[] lines = File.ReadAllLines(filePath);
@@ -369,7 +305,7 @@ namespace fp_fx_conversion_gui.ViewModels
 					sb.AppendLine(added);
 				}
 
-				string outPath = "output\\Result_Float_to_Fixed" + (SaveAsCSV ? ".csv" : ".txt");
+				string outPath = "output\\Result_Float_to_Fixed" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
 				using (StreamWriter sw = File.CreateText(outPath))
 				{
 					sw.Write(sb.ToString());
@@ -442,7 +378,7 @@ namespace fp_fx_conversion_gui.ViewModels
 			Executing = false;
 			Fp2Fx_TotalBits = Fx2Fp_TotalBits = 32;
 			Fp2Fx_TotalTestVectors = Fx2Fp_TotalTestVectors = 100;
-			SaveAsCSV = false;
+			GenerateMatlabAndCSV = false;
 
 			IcarusDir = Helpers.Utility.GetFullSystemPath("iverilog.exe");
 			if (IcarusDir == null)
@@ -496,7 +432,7 @@ namespace fp_fx_conversion_gui.ViewModels
 		}
 
 
-		public bool SaveAsCSV { get; set; }
+		public bool GenerateMatlabAndCSV { get; set; }
 
 
 	}

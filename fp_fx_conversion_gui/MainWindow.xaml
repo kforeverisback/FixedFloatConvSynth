@@ -48,8 +48,7 @@
 
         <Separator Margin="0,5,0,5"/>
         <UniformGrid Columns="2" Height="25">
-            <RadioButton Content="Save Output as CSV" IsChecked="{Binding SaveAsCSV}" Grid.Column="0" VerticalAlignment="Center"/>
-            <RadioButton Grid.Column="1" Content="Save Output as Txt" VerticalAlignment="Center"/>
+            <CheckBox x:Name="rad_csv" Content="Generate Matlab File for Figure Analysis" IsChecked="{Binding GenerateMatlabAndCSV}" Grid.Column="0" VerticalAlignment="Center"/>
         </UniformGrid>
         <Button Content="Compile and Verify with iVerilog" Command="{Binding ExecuteIcarus}"/>
         <Separator Margin="0,5,0,5"/>
