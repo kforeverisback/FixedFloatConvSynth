@@ -167,6 +167,49 @@ namespace fp_fx_conversion_gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to load __Fx2Fp__.csv; %GEN
+        ///n=1:size(__Fx2Fp__, 1); %GEN
+        ///
+        ///%==&gt;&gt;ForFixedToFloat
+        ///ffx=figure;
+        ///set(ffx,&apos;Name&apos;,&apos;Fixed to Float Conversion: Output Verification&apos;);
+        ///plot(n, __Fx2Fp__(:,3))
+        ///title(&apos;Fixed to Float Conversion: Output Verification&apos;);
+        ///
+        ///%==&gt;&gt;ForFloatToFixed
+        ///load __Fp2Fx__.csv; %GEN
+        ///n2=1:size(__Fp2Fx__, 1); %GEN
+        ///ffp=figure;
+        ///set(ffp,&apos;Name&apos;,&apos;Float to Fixed Conversion: Output Verification&apos;);
+        ///plot(n2, __Fp2Fx__(:,3))
+        ///title(&apos;Float to Fixed Conversion: Output Verification&apos;);
+        ///.
+        /// </summary>
+        public static string matlab_file {
+            get {
+                return ResourceManager.GetString("matlab_file", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result_Float_to_Fixed.
+        /// </summary>
+        public static string OutFile_Fp2Fx_NoExt {
+            get {
+                return ResourceManager.GetString("OutFile_Fp2Fx_NoExt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result_Fixed_to_Float.
+        /// </summary>
+        public static string OutFile_Fx2Fp_NoExt {
+            get {
+                return ResourceManager.GetString("OutFile_Fx2Fp_NoExt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to // shift &quot;in&quot; left until the most significant bit is a &quot;1&quot;
         ///// pass the shifted value, and number of shifts required
         ///// to the output.
@@ -179,6 +222,7 @@ namespace fp_fx_conversion_gui.Resources {
         ///input [WIDTH-1:0] in;
         ///output [WIDTH-1:0] out;
         ///output [WIDTH_DIST-1:0] distance;
+        ///wire [WIDTH_DIST-1:0] distance_w;
         ///
         ///wire [(WIDTH_DIST+1) * WIDTH-1:0] shift_layers;
         ///assign shift_layers [WIDTH-1:0] = in;
@@ -187,8 +231,7 @@ namespace fp_fx_conversion_gui.Resources {
         ///generate
         ///	for (i=0;i&lt;WIDTH_DIST;i=i+1)
         ///	begin : shft
-        ///		wire [WIDTH-1:0] layer_in;
-        ///		wire [WID [rest of string was truncated]&quot;;.
+        ///		wire [rest of string was truncated]&quot;;.
         /// </summary>
         public static string scale_up {
             get {

@@ -238,8 +238,8 @@ namespace fp_fx_conversion_gui.ViewModels
 		}
 
 		string numeric_format = "{0:N15}           {1:N15}           {2:N10}%    ";
-		string numeric_format_csv = "{0:N15},{1:N15},{2:N5}%";
-		public void VerifyFixedToFloatValues(string filePath, int bits)
+		string numeric_format_csv = "{0:N15},{1:N15},{2:N10}";
+		public void VerifyFixedToFloatValues(string filePath, int bits, string outPath)
 		{
 			if(File.Exists(filePath))
 			{
@@ -247,10 +247,10 @@ namespace fp_fx_conversion_gui.ViewModels
 				string header_format = "Input(Fixed)             Output(Float)            % Error   ";
 				StringBuilder sb = new StringBuilder();
 
-				if(!GenerateMatlabAndCSV)	sb.AppendLine("Input File: " + filePath);
+				//if(!GenerateMatlabAndCSV)	sb.AppendLine("Input File: " + filePath);
 				string format = GenerateMatlabAndCSV ? numeric_format_csv : numeric_format;
-				string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
-				sb.AppendLine(hformat);
+				//string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
+				//sb.AppendLine(hformat);
 
 				string[] lines = File.ReadAllLines(filePath);
 				List<float> fixedIn = new List<float>();
@@ -266,29 +266,32 @@ namespace fp_fx_conversion_gui.ViewModels
 					sb.AppendLine(added);
 				}
 
-				string outPath = "output\\Result_Fixed_to_Float" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
+				//string outPath = "output\\Result_Fixed_to_Float" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
 				File.Delete(outPath);
 				using (StreamWriter sw = File.CreateText(outPath))
 				{
+					sw.WriteLine("Input File: " + filePath);
+					sw.WriteLine(header_format);
 					sw.Write(sb.ToString());
 				}
 
-				Process.Start(outPath);
+				if (!GenerateMatlabAndCSV)
+					Process.Start(outPath);
 			}
 		}
 
-		public void VerifyFloatToFixedValues(string filePath, int bits)
+		public void VerifyFloatToFixedValues(string filePath, int bits, string outPath)
 		{
 			if (File.Exists(filePath))
 			{
 				string header_format_csv = "Input_Float,Output_Fixed,Error";
 				string header_format = "Input(Float)             Output(Fixed)            % Error   ";
 				StringBuilder sb = new StringBuilder();
-				if (!GenerateMatlabAndCSV) sb.AppendLine("Input File: " + filePath);
+				//if (!GenerateMatlabAndCSV) sb.AppendLine("Input File: " + filePath);
 
 				string format = GenerateMatlabAndCSV ? numeric_format_csv : numeric_format;
-				string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
-				sb.AppendLine(hformat);
+				//string hformat = GenerateMatlabAndCSV ? header_format_csv : header_format;
+				//sb.AppendLine(hformat);
 
 				string[] lines = File.ReadAllLines(filePath);
 				List<float> fixedIn = new List<float>();
@@ -305,13 +308,34 @@ namespace fp_fx_conversion_gui.ViewModels
 					sb.AppendLine(added);
 				}
 
-				string outPath = "output\\Result_Float_to_Fixed" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
+				//string outPath = "output\\Result_Float_to_Fixed" + (GenerateMatlabAndCSV ? ".csv" : ".txt");
 				using (StreamWriter sw = File.CreateText(outPath))
 				{
+					sw.WriteLine("Input File: " + filePath);
+					sw.WriteLine(header_format);
 					sw.Write(sb.ToString());
 				}
 
-				Process.Start(outPath);
+				if(!GenerateMatlabAndCSV)
+					Process.Start(outPath);
+			}
+		}
+
+		void GenerateMatlab(string outPath)
+		{
+			File.Delete(outPath);
+			StringBuilder sb = new StringBuilder(Resources.Res.matlab_file);
+			if (Select_Fixed2FP)
+			{
+				sb.Replace("%==>>", "").Replace("__Fx2Fp__", Resources.Res.OutFile_Fx2Fp_NoExt);
+			}
+			if (Select_FP2Fixed)
+			{
+				sb.Replace("%-->>", "").Replace("__Fp2Fx__", Resources.Res.OutFile_Fp2Fx_NoExt);
+			}
+			using (StreamWriter sw = File.CreateText(outPath))
+			{
+				sw.Write(sb.ToString());
 			}
 		}
 
@@ -344,8 +368,10 @@ namespace fp_fx_conversion_gui.ViewModels
 					}
 					StatusString = "Fixed to Floating Compilation " + (iCarusFx2Fp?"Succeeded!":"Failed!");
 
-					string outPath = Path.Combine(w, "fx2fp_out.txt");
-					await Task.Factory.StartNew(() => { VerifyFixedToFloatValues(outPath, Fx2Fp_TotalBits); });
+					string inputPath = Path.Combine(w, "fx2fp_out.txt");
+					string outPath = Path.Combine(w, Resources.Res.OutFile_Fx2Fp_NoExt + ".txt");
+
+					await Task.Factory.StartNew(() => { VerifyFixedToFloatValues(inputPath, Fx2Fp_TotalBits, outPath); });
 				}
 				await Task.Delay(500);
 				if (Select_FP2Fixed)
@@ -362,9 +388,17 @@ namespace fp_fx_conversion_gui.ViewModels
 
 					StatusString = "Floating to Fixed Compilation " + (iCarusFp2Fx ? "Succeeded!" : "Failed!");
 
-					string outPath = Path.Combine(w, "fp2fx_out.txt");
-					await Task.Factory.StartNew(() => { VerifyFloatToFixedValues(outPath, Fx2Fp_TotalBits); });
+					string inputPath = Path.Combine(w, "fp2fx_out.txt");
+					string outPath = Path.Combine(w, Resources.Res.OutFile_Fp2Fx_NoExt + ".txt");
+				
+					await Task.Factory.StartNew(() => { VerifyFloatToFixedValues(inputPath, Fx2Fp_TotalBits, outPath); });
+
 				}
+				await Task.Factory.StartNew(() => 
+				{
+					GenerateMatlab("output\\verify_float_fixed.m"); }
+				);
+				MessageBox.Show("Matlab file named: verify_float_fixed.m" + " written", "Matlab File", MessageBoxButton.OK, MessageBoxImage.Information);
 
 				/*
 				//Execute Icarus for Float to Fixed
