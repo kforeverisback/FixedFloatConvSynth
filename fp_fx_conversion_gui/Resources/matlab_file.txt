@@ -1,5 +1,5 @@
 %ForFixedToFloat
-%==>>load __Fx2Fp__.csv; %GEN
+%==>>load __Fx2Fp__.txt; %GEN
 %==>>n=1:size(__Fx2Fp__, 1); %GEN
 %==>>ffx=figure;
 %==>>set(ffx,'Name','Fixed to Float Conversion: Output Verification');
@@ -8,7 +8,7 @@
 %==>>fixed_to_float_mismatched=__Fx2Fp__(find(__Fx2Fp__(:,3) ~= 0), 1:2);
 
 %ForFloatToFixed
-%-->>load __Fp2Fx__.csv; %GEN
+%-->>load __Fp2Fx__.txt; %GEN
 %-->>n2=1:size(__Fp2Fx__, 1); %GEN
 %-->>ffp=figure;
 %-->>set(ffp,'Name','Float to Fixed Conversion: Output Verification');
