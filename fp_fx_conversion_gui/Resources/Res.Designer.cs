@@ -63,7 +63,7 @@ namespace fp_fx_conversion_gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to module fixed_to_ieeefp(fp_output, fx_input);
         ///
-        ///	parameter FIXED_TOTAL_BIT = 8;
+        ///	parameter FIXED_TOTAL_BIT = __TOTAL_BITS__;
         ///	
         ///	input [FIXED_TOTAL_BIT-1:0] fx_input;
         ///	output [31:0] fp_output;
@@ -81,7 +81,7 @@ namespace fp_fx_conversion_gui.Resources {
         ///	wire [7:0] shift_amnt;
         ///	
         ///	wire [FIXED_TOTAL_BIT-2:0] fx_number_without_sign;
-        ///	twos_complement tc(fx_n [rest of string was truncated]&quot;;.
+        ///	twos_compl [rest of string was truncated]&quot;;.
         /// </summary>
         public static string fixed_to_float {
             get {
@@ -118,7 +118,7 @@ namespace fp_fx_conversion_gui.Resources {
         /// <summary>
         ///   Looks up a localized string similar to module ieeefp_to_fixed(fx_number,fp_input);
         ///
-        ///	parameter FIXED_TOTAL_BIT = 8;
+        ///	parameter FIXED_TOTAL_BIT = __TOTAL_BITS__;
         ///	
         ///	//Total input bit width = 32
         ///	input [31:0] fp_input;
@@ -133,11 +133,37 @@ namespace fp_fx_conversion_gui.Resources {
         ///	wire [31:0] aggregated = {1&apos;b1,fp_mantissa,8&apos;d0};
         ///	wire [7:0] shift_amnt = 8&apos;d127 - fp_exp - 1; // this -1 is for the extra 1
         ///	
-        ///	wire [31:0] shifted_o [rest of string was truncated]&quot;;.
+        ///	wire [31 [rest of string was truncated]&quot;;.
         /// </summary>
         public static string float_to_fixed {
             get {
                 return ResourceManager.GetString("float_to_fixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to module ieeefp_to_fixed(fx_number,fp_input);
+        ///
+        ///	parameter FIXED_TOTAL_BIT = __TOTAL_BITS__;
+        ///	
+        ///	//Total input bit width = 32
+        ///	input [31:0] fp_input;
+        ///	wire fx_sign;
+        ///	output [FIXED_TOTAL_BIT-1:0] fx_number;
+        ///	
+        ///	wire [7:0] fp_exp;
+        ///	wire [22:0] fp_mantissa;
+        ///	wire [FIXED_TOTAL_BIT-1-1:0] fx_number_without_sign;
+        ///	assign {fx_sign, fp_exp, fp_mantissa} = fp_input;
+        ///	
+        ///	wire [31:0] aggregated = {1&apos;b1,fp_mantissa,8&apos;d0};
+        ///	wire [7:0] shift_amnt = 8&apos;d127 - fp_exp - 1; // this -1 is for the extra 1
+        ///	
+        ///	wire [FI [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string float_to_fixed_64 {
+            get {
+                return ResourceManager.GetString("float_to_fixed_64", resourceCulture);
             }
         }
         
@@ -167,23 +193,20 @@ namespace fp_fx_conversion_gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to load __Fx2Fp__.csv; %GEN
-        ///n=1:size(__Fx2Fp__, 1); %GEN
+        ///   Looks up a localized string similar to %ForFixedToFloat
+        ///%==&gt;&gt;load __Fx2Fp__.txt; %GEN
+        ///%==&gt;&gt;n=1:size(__Fx2Fp__, 1); %GEN
+        ///%==&gt;&gt;ffx=figure;
+        ///%==&gt;&gt;set(ffx,&apos;Name&apos;,&apos;Fixed to Float Conversion: Output Verification&apos;);
+        ///%==&gt;&gt;plot(n, __Fx2Fp__(:,3))
+        ///%==&gt;&gt;title(&apos;Fixed to Float Conversion: Output Verification&apos;);
+        ///%==&gt;&gt;fixed_to_float_mismatched=__Fx2Fp__(find(__Fx2Fp__(:,3) ~= 0), 1:2);
         ///
-        ///%==&gt;&gt;ForFixedToFloat
-        ///ffx=figure;
-        ///set(ffx,&apos;Name&apos;,&apos;Fixed to Float Conversion: Output Verification&apos;);
-        ///plot(n, __Fx2Fp__(:,3))
-        ///title(&apos;Fixed to Float Conversion: Output Verification&apos;);
-        ///
-        ///%==&gt;&gt;ForFloatToFixed
-        ///load __Fp2Fx__.csv; %GEN
-        ///n2=1:size(__Fp2Fx__, 1); %GEN
-        ///ffp=figure;
-        ///set(ffp,&apos;Name&apos;,&apos;Float to Fixed Conversion: Output Verification&apos;);
-        ///plot(n2, __Fp2Fx__(:,3))
-        ///title(&apos;Float to Fixed Conversion: Output Verification&apos;);
-        ///.
+        ///%ForFloatToFixed
+        ///%--&gt;&gt;load __Fp2Fx__.txt; %GEN
+        ///%--&gt;&gt;n2=1:size(__Fp2Fx__, 1); %GEN
+        ///%--&gt;&gt;ffp=figure;
+        ///%--&gt;&gt;set(ffp,&apos;Name&apos;,&apos;Float to Fixed Conversion: Output Verificati [rest of string was truncated]&quot;;.
         /// </summary>
         public static string matlab_file {
             get {
@@ -268,6 +291,15 @@ namespace fp_fx_conversion_gui.Resources {
         public static string twos_comp {
             get {
                 return ResourceManager.GetString("twos_comp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to __BIT_DIFFERENCE__.
+        /// </summary>
+        public static string V_Fp2Fx_Bit_Diff {
+            get {
+                return ResourceManager.GetString("V_Fp2Fx_Bit_Diff", resourceCulture);
             }
         }
         

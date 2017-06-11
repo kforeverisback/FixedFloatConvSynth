@@ -13,5 +13,10 @@ namespace fp_fx_conversion_gui
 	/// </summary>
 	public partial class App : Application
 	{
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			WpfSingleInstanceByEventWaitHandle.WpfSingleInstance.Make("<Float>Astalavista<Fixed>", this);
+			base.OnStartup(e);
+		}
 	}
 }

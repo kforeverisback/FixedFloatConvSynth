@@ -1,7 +1,7 @@
-﻿<Application x:Class="FP_FX_Converter.App"
+﻿<Application x:Class="fp_fx_conversion_gui.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FP_FX_Converter"
+             xmlns:local="clr-namespace:fp_fx_conversion_gui"
              xmlns:vm="clr-namespace:fp_fx_conversion_gui.ViewModels"
              xmlns:converters="clr-namespace:fp_fx_conversion_gui.Helpers"
              StartupUri="MainWindow.xaml">

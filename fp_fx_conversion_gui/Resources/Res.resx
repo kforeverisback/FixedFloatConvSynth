@@ -154,13 +154,19 @@
   <data name="Status_Default" xml:space="preserve">
     <value>Any Status Will Show here...</value>
   </data>
-  <data name="matlab_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>matlab_file.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  <data name="OutFile_Fx2Fp_NoExt" xml:space="preserve">
+    <value>Result_Fixed_to_Float</value>
   </data>
   <data name="OutFile_Fp2Fx_NoExt" xml:space="preserve">
     <value>Result_Float_to_Fixed</value>
   </data>
-  <data name="OutFile_Fx2Fp_NoExt" xml:space="preserve">
-    <value>Result_Fixed_to_Float</value>
+  <data name="matlab_file" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>matlab_file.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="float_to_fixed_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>float_to_fixed_64.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="V_Fp2Fx_Bit_Diff" xml:space="preserve">
+    <value>__BIT_DIFFERENCE__</value>
   </data>
 </root>

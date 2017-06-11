@@ -1,6 +1,6 @@
 module fixed_to_ieeefp(fp_output, fx_input);
 
-	parameter FIXED_TOTAL_BIT = 8;
+	parameter FIXED_TOTAL_BIT = __TOTAL_BITS__;
 	
 	input [FIXED_TOTAL_BIT-1:0] fx_input;
 	output [31:0] fp_output;
@@ -27,7 +27,7 @@ module fixed_to_ieeefp(fp_output, fx_input);
 				.out(scaled_out),
 				.distance(shift_amnt));
 		defparam sc .WIDTH = 32;
-		defparam sc .WIDTH_DIST = 8;
+		defparam sc .WIDTH_DIST = 5;//As 32 = 2^5
 	
 	assign fp_exp = 8'd127-shift_amnt-1;
 	assign fp_mantissa = scaled_out[31-1:32-23-1];

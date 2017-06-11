@@ -10,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace fp_fx_conversion_gui.Helpers
 {
+	using System.Numerics;
+
 	static class Utility
 	{
+		public static BigInteger PowInt(BigInteger bi, long power)
+		{
+			BigInteger ret = new BigInteger(1);
+
+			return ret;
+		}
 		public static string ToBitString(this BitArray bits)
 		{
-			var sb = new StringBuilder();
-
-			for (int i = bits.Count - 1; i >= 0; i--)
-			{
-				char c = bits[i] ? '1' : '0';
-				sb.Append(c);
-			}
-
-			return sb.ToString();
+			return Utility.ToBitString(bits, bits.Count);
 		}
 
 		public static string ToBitString(this BitArray bits, int bit_count)
@@ -44,6 +44,12 @@ namespace fp_fx_conversion_gui.Helpers
 			return GetFullPath(fileName) != null;
 		}
 
+		public static bool FilePathHasInvalidChars(string path)
+		{
+
+			return (!string.IsNullOrEmpty(path) && path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0);
+		}
+
 		public static string GetFullSystemPath(string fileName)
 		{
 			if (File.Exists(fileName))
@@ -52,6 +58,8 @@ namespace fp_fx_conversion_gui.Helpers
 			var values = Environment.GetEnvironmentVariable("PATH");
 			foreach (var path in values.Split(';'))
 			{
+				if (FilePathHasInvalidChars(path))
+					continue;
 				var fullPath = Path.Combine(path, fileName);
 				if (File.Exists(fullPath))
 					return fullPath;

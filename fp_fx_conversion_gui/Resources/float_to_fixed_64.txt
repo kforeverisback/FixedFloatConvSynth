@@ -15,12 +15,13 @@ module ieeefp_to_fixed(fx_number,fp_input);
 	wire [31:0] aggregated = {1'b1,fp_mantissa,8'd0};
 	wire [7:0] shift_amnt = 8'd127 - fp_exp - 1; // this -1 is for the extra 1
 	
-	wire [31:0] shifted_out = aggregated >> shift_amnt;
+	wire [FIXED_TOTAL_BIT-1-1:0] shifted_out = {aggregated >> shift_amnt,__BIT_DIFFERENCE__'d0};
 	
-	twos_complement tc(fx_number_without_sign, shifted_out[31:32-FIXED_TOTAL_BIT+1]);
+	twos_complement tc(fx_number_without_sign, shifted_out);
+
 	defparam tc .BITS = FIXED_TOTAL_BIT-1;
 	
-	assign fx_number[FIXED_TOTAL_BIT-1] = fx_sign;  //assigning the sign bit	
-	assign fx_number[FIXED_TOTAL_BIT-2:0] = fx_sign?fx_number_without_sign:shifted_out[31:32-FIXED_TOTAL_BIT+1]; //+1 is for excluding the sign bit count
+	assign fx_number[FIXED_TOTAL_BIT-1] = fx_sign;  //assigning the sign bit
+	assign fx_number[FIXED_TOTAL_BIT-2:0] = fx_sign?fx_number_without_sign:shifted_out; //+1 is for excluding the sign bit count
 	
 endmodule

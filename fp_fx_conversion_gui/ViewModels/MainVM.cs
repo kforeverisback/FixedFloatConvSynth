@@ -14,6 +14,7 @@ namespace fp_fx_conversion_gui.ViewModels
 	using System.Windows;
 	using System.Collections;
 	using Helpers;
+	using System.Numerics;
 	public class MainVM : ObservableObject
 	{
 		public static string OutputDir = "output";
@@ -24,22 +25,30 @@ namespace fp_fx_conversion_gui.ViewModels
 			Dictionary<string, string> files = new Dictionary<string, string>();
 			if(Select_FP2Fixed)
 			{
-				files.Add("float_to_fixed.v", Resources.Res.float_to_fixed);
+				if (Fp2Fx_TotalBits > 32)
+				{
+					StringBuilder sb = new StringBuilder(Resources.Res.float_to_fixed_64);
+					sb.Replace(Resources.Res.V_TOT_BITS, Fp2Fx_TotalBits.ToString());
+					sb.Replace(Resources.Res.V_Fp2Fx_Bit_Diff, (Fp2Fx_TotalBits - 32 - 1).ToString());
 
-				StringBuilder sb = new StringBuilder(Resources.Res.float_to_fixed_tb);
-				sb.Replace(Resources.Res.V_TOT_BITS, Fp2Fx_TotalBits.ToString());
-				files.Add("float_to_fixed_tb.v", sb.ToString());
+					files.Add("float_to_fixed.v", sb.ToString());
+				}
+				else
+				{
+					files.Add("float_to_fixed.v", Resources.Res.float_to_fixed.Replace(Resources.Res.V_TOT_BITS, Fp2Fx_TotalBits.ToString()));
+
+				}
+
+				files.Add("float_to_fixed_tb.v", Resources.Res.float_to_fixed_tb.Replace(Resources.Res.V_TOT_BITS, Fp2Fx_TotalBits.ToString()));
 
 				GenerateFloatingPointData(Fp2Fx_TotalTestVectors, Path.Combine(OutputDir, Resources.Res.V_Fp2Fx_Data));
 			}
 
 			if (Select_Fixed2FP)
 			{
-				files.Add("fixed_to_float.v", Resources.Res.fixed_to_float);
+				files.Add("fixed_to_float.v", Resources.Res.fixed_to_float.Replace(Resources.Res.V_TOT_BITS, Fx2Fp_TotalBits.ToString()));
 
-				StringBuilder sb = new StringBuilder(Resources.Res.fixed_to_float_tb);
-				sb.Replace(Resources.Res.V_TOT_BITS, Fx2Fp_TotalBits.ToString());
-				files.Add("fixed_to_float_tb.v", sb.ToString());
+				files.Add("fixed_to_float_tb.v", Resources.Res.fixed_to_float_tb.Replace(Resources.Res.V_TOT_BITS, Fx2Fp_TotalBits.ToString()));
 
 				files.Add("scale_up.v", Resources.Res.scale_up);
 				GenerateFixedPointData(Fx2Fp_TotalTestVectors, Fx2Fp_TotalBits, Path.Combine(OutputDir, Resources.Res.V_Fx2Fp_Data));
@@ -66,6 +75,7 @@ namespace fp_fx_conversion_gui.ViewModels
 				int lim = count / 4;
 				List<float> values = new List<float>(count);
 				for(int i = 0; i < lim; i++)
+
 				{
 					float val = (float)(((double)r.Next(-Int32.MaxValue/2048, Int32.MaxValue/2048))/(double)UInt32.MaxValue);
 					values.Add(val);
@@ -137,8 +147,9 @@ namespace fp_fx_conversion_gui.ViewModels
 
 				foreach (var val in values)
 				{
-					int ival = (int)(val * Math.Pow(2,(bits - 1)));
+					long ival = (long)(val * Math.Pow(2,(bits - 1)));
 					byte[] fbytes = BitConverter.GetBytes(ival);
+					BigInteger bi = new BigInteger(1);
 					BitArray ba = new BitArray(fbytes);
 #if DEBUG
 					sw.WriteLine(ba.ToBitString(bits));
@@ -379,8 +390,9 @@ namespace fp_fx_conversion_gui.ViewModels
 					string outPath = Path.Combine(w, Resources.Res.OutFile_Fx2Fp_NoExt + ".txt");
 
 					await Task.Factory.StartNew(() => { VerifyFixedToFloatValues(inputPath, Fx2Fp_TotalBits, outPath); });
+					await Task.Delay(500);
 				}
-				await Task.Delay(500);
+
 				if (Select_FP2Fixed)
 				{
 					args = " -o \"<PATH>\\fp_2_fixed.vvp\" \"<PATH>\\float_to_fixed.v\" \"<PATH>\\twos_comp.v\" \"<PATH>\\float_to_fixed_tb.v\"".Replace("<PATH>", w);
@@ -398,7 +410,7 @@ namespace fp_fx_conversion_gui.ViewModels
 					string inputPath = Path.Combine(w, "fp2fx_out.txt");
 					string outPath = Path.Combine(w, Resources.Res.OutFile_Fp2Fx_NoExt + ".txt");
 				
-					await Task.Factory.StartNew(() => { VerifyFloatToFixedValues(inputPath, Fx2Fp_TotalBits, outPath); });
+					await Task.Factory.StartNew(() => { VerifyFloatToFixedValues(inputPath, Fp2Fx_TotalBits, outPath); });
 
 				}
 				if(GenerateMatlabAndCSV)
@@ -427,7 +439,11 @@ namespace fp_fx_conversion_gui.ViewModels
 			IcarusDir = Helpers.Utility.GetFullSystemPath("iverilog.exe");
 			if (IcarusDir == null)
 			{
+#if DEBUG
+				IcarusDir = "E:\\iverilog\\bin\\iverilog.exe";
+#else
 				IcarusDir = "Enter Icarus iVerilog \'bin\' directory";
+#endif
 			}
 		}
 
